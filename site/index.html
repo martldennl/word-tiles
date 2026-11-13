@@ -15,8 +15,12 @@
       <button id="all" type="button" title="All games on this board, and a new one"></button>
     </header>
     <main id="table">
-      <!-- The board: 11 × 11 squares. Every tile on it has the color of who laid it. -->
-      <div id="board" role="grid" aria-label="The board"></div>
+      <!-- The board: a frame with the coordinates (A to K along the top, 1 to 11 down the side), in it the field of 11 × 11 squares. Every tile's letter has the ink of who laid it. -->
+      <div id="board">
+        <div id="cols" aria-hidden="true"></div>
+        <div id="rows" aria-hidden="true"></div>
+        <div id="field" role="grid" aria-label="The board"></div>
+      </div>
       <!-- Beside it: the players and their points, whose turn it is, the last move (and the doubt), all moves. -->
       <aside id="side">
         <ol id="players"></ol>
@@ -42,7 +46,7 @@
         <input id="name" placeholder="A new game: its name…" maxlength="80" autocomplete="off" />
         <button id="start" type="button">Start it</button>
       </div>
-      <p id="how">Lay words from the open rack so that they cross what lies there. <i class="mark dl"></i> letter ×2 · <i class="mark tl"></i> letter ×3 · <i class="mark dw"></i> word ×2 · all seven +30. No dictionary: a word stands unless the others doubt it.</p>
+      <p id="how">Lay words from the open rack so that they cross what lies there. On the board: <i class="mark dl">2</i> the letter counts twice, <i class="mark tl">3</i> three times, <i class="mark dw">×2</i> the word counts twice. All seven tiles at once: 30 on top. No dictionary: a word stands unless the others doubt it.</p>
     </section>
     <p id="status" role="status"></p>
     <!-- Tiles on their way: from the rack to the board, and back when a word is taken back. -->

@@ -55,20 +55,22 @@
     }
     return all;
   }
-  /** A person as a round chip: their initials on their color (the frame gets no pictures of them). */
+  /** A person as a turned wooden pawn in their color (the frame gets no pictures of them). */
   function chip(name, h, small) {
-    const words = String(name).trim().split(/\s+/);
-    const c = el('span', small ? 'chip small' : 'chip', words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2));
+    const c = el('span', small ? 'pawn small' : 'pawn');
+    c.title = String(name);
     c.style.setProperty('--h', h);
     return c;
   }
   const called = (did) => (did === me.did ? 'You' : (game.players.find((player) => player.did === did)?.name ?? '?'));
   const names = (list) => (list.length < 2 ? list.join('') : `${list.slice(0, -1).join(', ')} and ${list.at(-1)}`);
 
-  /** A tile: its letter large, what it counts small in the corner. With a color: glazed, laid by that player. */
+  /** A tile: its letter large, what it counts small in the corner. With a color: laid by that player, its letter in their ink. */
   function tile(letter, h) {
     const t = el('span', 'tile', letter);
-    t.append(el('b', '', String(RULES.LETTERS[letter]?.[1] ?? '')));
+    const value = String(RULES.LETTERS[letter]?.[1] ?? '');
+    t.append(el('b', '', value));
+    if (value.length > 1) t.classList.add('two');
     if (h !== undefined) {
       t.classList.add('laid');
       t.style.setProperty('--h', h);
@@ -83,19 +85,24 @@
     const w = window.innerWidth, h = window.innerHeight;
     const phone = w < 430, wide = w >= 900;
     const side = phone ? 0 : wide ? 280 : 130;
-    const across = Math.floor((w - 16 - (side ? side + 10 : 0) - 10) / 11);
-    const down = Math.floor((h - 16 - (wide ? 38 : 32) - (wide ? 52 : 46) - 10) / 11);
+    // Around the squares: the table's edge (5 each side), the board's frame (13 with the coordinates, 5 without), 8 between board and pad.
+    const across = Math.floor((w - 10 - (side ? side + 8 : 0) - 18) / 11);
+    const down = Math.floor((h - 10 - (wide ? 34 : 28) - (wide ? 51 : 45) - 18) / 11);
     const s = Math.max(22, Math.min(across, phone ? across : Math.max(down, 34), 58));
     document.body.classList.toggle('phone', phone);
     document.body.classList.toggle('wide', wide);
     document.documentElement.style.setProperty('--s', `${s}px`);
     document.documentElement.style.setProperty('--side', `${side}px`);
-    document.body.style.width = `${s * 11 + 10 + (side ? side + 10 : 0) + 16}px`;
+    document.body.style.width = `${s * 11 + 18 + (side ? side + 8 : 0) + 10}px`;
   }
   window.addEventListener('resize', room);
   room();
 
-  /** The board's squares, made once. */
+  /** The board's coordinates in its frame, as on a chess board, and its squares: made once. */
+  for (let i = 0; i < RULES.SIZE; i++) {
+    $('cols').append(el('span', '', RULES.COLUMNS[i]));
+    $('rows').append(el('span', '', String(i + 1)));
+  }
   for (let y = 0; y < RULES.SIZE; y++) {
     for (let x = 0; x < RULES.SIZE; x++) {
       const at = RULES.square(x, y);
@@ -104,7 +111,7 @@
       cell.dataset.at = at;
       cell.title = `${at}${{ dl: ' · the letter counts double', tl: ' · the letter counts three times', dw: ' · the word counts double' }[kind] ?? ''}${at === RULES.MIDDLE ? ' · the first word goes through here' : ''}`;
       cell.addEventListener('click', () => put(at));
-      cells.set(at, $('board').appendChild(cell));
+      cells.set(at, $('field').appendChild(cell));
     }
   }
 
@@ -199,24 +206,31 @@
     $('bag').textContent = game.bag ? `· ${game.bag} in the bag` : '· the bag is empty';
   }
 
-  /** The board: every laid tile in its player's color, the last move's marked; my tentative tiles; what they would count. */
+  /** The board: every laid tile with its player's ink, a ring of light under the last move's; my tentative tiles; what they would count. */
   function drawBoard(paint, move) {
     const last = lastMove();
     const marked = last && last.move === 'play' && !last.taken ? last.n : undefined;
-    for (const cell of cells.values()) cell.replaceChildren();
-    for (const node of $('board').querySelectorAll('.sum, .flag')) node.remove();
+    for (const cell of cells.values()) {
+      cell.replaceChildren();
+      cell.classList.remove('lit', 'under', 'bad');
+    }
+    for (const node of $('field').querySelectorAll('.sum, .flag')) node.remove();
     for (const laid of game.tiles) {
-      const t = tile(laid.letter, paint.get(laid.by));
-      if (laid.n === marked) t.classList.add('last');
-      cells.get(laid.at)?.append(t);
+      const cell = cells.get(laid.at);
+      if (!cell) continue;
+      cell.append(tile(laid.letter, paint.get(laid.by)));
+      if (laid.n === marked) cell.classList.add('lit');
     }
     for (const p of placed) {
+      const cell = cells.get(p.at);
+      if (!cell) continue;
       const t = tile(hand[p.slot], paint.get(me.did) ?? 210);
       t.classList.add('mine');
-      if (move?.error) t.classList.add('bad');
+      cell.classList.add('under');
+      if (move?.error) cell.classList.add('bad');
       if (sent) t.classList.add('sending');
       t.addEventListener('pointerdown', (e) => grab(e, t, p.slot));
-      cells.get(p.at)?.append(t);
+      cell.append(t);
     }
     for (const cell of cells.values()) cell.classList.toggle('free', canLay() && !cell.firstChild && picked !== null);
     if (move && !move.error) {
@@ -226,7 +240,7 @@
       const sum = el('span', 'sum', `+${move.points}`);
       sum.style.left = `${end.offsetLeft + end.offsetWidth}px`;
       sum.style.top = `${end.offsetTop}px`;
-      $('board').append(sum);
+      $('field').append(sum);
     }
   }
 
@@ -256,9 +270,10 @@
   /** Beside the board: the players and their points, whose turn it is (or what my tiles would count), the last move, all moves. */
   function drawSide(paint, move) {
     const inGame = game.players.some((player) => player.did === me.did);
+    const most = Math.max(...game.players.map((player) => player.score));
     $('players').replaceChildren(
       ...game.players.map((player) => {
-        const li = el('li', `${player.did === game.turn ? 'turn' : ''} ${game.winners?.includes(player.did) ? 'won' : ''}`);
+        const li = el('li', `${player.did === game.turn ? 'turn' : ''} ${game.winners?.includes(player.did) ? 'won' : ''} ${most > 0 && player.score === most ? 'lead' : ''}`);
         li.dataset.did = player.did;
         li.style.setProperty('--h', paint.get(player.did));
         const who = el('span', 'who', player.name);
@@ -346,9 +361,7 @@
         if (last.taken) card.append(el('p', '', `Taken back: ${names(last.doubts.map((doubt) => (doubt.by === me.did ? 'you' : doubt.name)))} doubted it.`));
         else {
           if (last.doubts.length) {
-            const doubts = el('div', 'doubts');
-            doubts.append(...last.doubts.map((doubt) => chip(doubt.name, paint.get(doubt.by), true)), `${last.doubts.length} of ${game.doubts} doubt it`);
-            card.append(doubts);
+            card.append(el('div', 'doubts', `${names(last.doubts.map((doubt) => (doubt.by === me.did ? 'You' : doubt.name)))} doubt${last.doubts.length === 1 && last.doubts[0].by !== me.did ? 's' : ''} it: ${last.doubts.length} of ${game.doubts}`));
           }
           const mine = last.doubts.some((doubt) => doubt.by === me.did);
           if (inGame && last.by !== me.did && !mine) card.append(acts(button('Doubt it', 'doubt', ask('doubt', { post: game.id }), `Not a word? If ${game.doubts === 1 ? 'you doubt it' : `${game.doubts} of the others doubt it`}, it is taken back`)));
@@ -433,7 +446,8 @@
     $('fly').append(g);
     const dx = to.left - from.left, dy = to.top - from.top;
     if (shaken) g.animate([{ translate: '0 0', rotate: '0deg' }, { translate: '-3px 0', rotate: '-7deg' }, { translate: '3px 0', rotate: '7deg' }, { translate: '-3px 0', rotate: '-6deg' }, { translate: '3px 0', rotate: '5deg' }, { translate: '0 0', rotate: '0deg' }], { duration: shaken });
-    const flight = g.animate([{ translate: '0 0', scale: 1 }, { translate: `${dx * 0.5}px ${dy * 0.5 - 22}px`, scale: 1.3, offset: 0.5 }, { translate: `${dx}px ${dy}px`, scale: 1 }], { duration: 400, delay: wait + shaken, easing: 'cubic-bezier(.35, .05, .25, 1)', fill: 'both' });
+    // Carried over in a low arc, a little tilted, as a hand would.
+    const flight = g.animate([{ translate: '0 0', scale: 1, rotate: '0deg' }, { translate: `${dx * 0.5}px ${dy * 0.5 - 18}px`, scale: 1.18, rotate: '6deg', offset: 0.5 }, { translate: `${dx}px ${dy - 5}px`, scale: 1, rotate: '0deg' }], { duration: 420, delay: wait + shaken, easing: 'cubic-bezier(.35, .05, .25, 1)', fill: 'both' });
     flight.onfinish = () => {
       g.remove();
       then();
@@ -547,11 +561,12 @@
       li.append(gain);
     }
 
-    // The game is over: a small burst for whoever won.
+    // The game is over: a quiet flourish for whoever won. A few paper streamers go up from their line and sink.
     if (game.over && !before.over) {
+      const papers = ['#b5432c', '#d9b24f', '#2f7a53', '#35508f', '#f3e8c8'];
       for (const li of $('players').querySelectorAll('.won')) {
         const b = el('span', 'burst');
-        for (let i = 0; i < 28; i++) b.appendChild(el('i')).style.cssText = `--turn: ${i * 12.86 + 5}deg; --far: ${46 + (i % 4) * 26}px; --c: ${(i * 47) % 360}; --wait: ${wait + 500 + (i % 4) * 70}ms`;
+        for (let i = 0; i < 14; i++) b.appendChild(el('i')).style.cssText = `--x: ${Math.round((i - 6.5) * 9 + (i % 2 ? 5 : -5))}px; --up: ${-(22 + (i % 4) * 9)}px; --spin: ${(i % 2 ? 1 : -1) * (260 + i * 30)}deg; --c: ${papers[i % papers.length]}; --wait: ${wait + 500 + (i % 5) * 80}ms`;
         li.append(b);
         li.classList.add('cheer');
         li.style.setProperty('--wait', `${wait + 450}ms`);
@@ -574,9 +589,9 @@
     const under = y + (move.dir === 'down' ? move.word.length : 1);
     const lying = (row) => (row < 0 || row >= RULES.SIZE ? 0.5 : [0, 1, 2, 3].filter((i) => cells.get(RULES.square(Math.min(x + i, RULES.SIZE - 1), row)).firstChild).length);
     const above = lying(y - 1) <= lying(under);
-    f.style.left = `${Math.max(0, Math.min(start.offsetLeft, $('board').offsetWidth - 150))}px`;
-    f.style.top = `${above ? start.offsetTop - 27 : start.offsetTop + (under - y) * (start.offsetHeight + 1) + 2}px`;
-    $('board').append(f);
+    f.style.left = `${Math.max(0, Math.min(start.offsetLeft, $('field').offsetWidth - 150))}px`;
+    f.style.top = `${above ? start.offsetTop - 25 : start.offsetTop + (under - y) * start.offsetHeight + 3}px`;
+    $('field').append(f);
     setTimeout(() => f.remove(), wait + 3700);
   }
 

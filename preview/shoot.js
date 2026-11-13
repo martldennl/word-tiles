@@ -1,13 +1,13 @@
 // Photographs of the preview, into preview/out/: the game in a board's room (540 × 480) in its middle and at its
 // end, dark and light; in a window of its own (1050 wide); on a phone; a game just made, and a board without one;
-// the list of games. Then the last part of the sample game, played as Weave shows it (sandboxed) with a real
+// the list of games; a few tiles close up (close-tiles.png). Then the last part of the sample game, played as Weave shows it (sandboxed) with a real
 // pointer where Mara acts herself: she drags tiles from the rack (what they would count shows), presses Play, a
 // friend's word arrives, one is doubted (she clicks "Doubt it") and flies back, her agent lays a word, the last
 // tiles are laid. Four of these moments on one sheet. It starts the preview's server and a headless Chrome (through
 // the videos' tools/cdp.js) and stops both again.
 //
 //   node preview/shoot.js
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -101,6 +101,10 @@ try {
   }
   await wait(200);
   await b.shot(file('tentative'));
+  // Close up, at twice the size: tiles that lie, tiles lying tentatively, the ring of light under the last move, the printed squares.
+  const from = spots.cells.F3, to = spots.cells.K9;
+  const close = await b.send('Page.captureScreenshot', { format: 'png', clip: { x: from.x - 19, y: from.y - 19, width: to.x - from.x + 46, height: to.y - from.y + 40, scale: 2 } });
+  writeFileSync(file('close-tiles'), Buffer.from(close.data, 'base64'));
   await b.shot(file('scene-1'));
   await click(spots.play);
   await wait(330);

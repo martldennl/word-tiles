@@ -1,226 +1,283 @@
-/* Glazed tiles on slate. The board is a slab of slate with a recess for every square (dark where Weave is dark, a
-   pale stone where it's light); a tile is a small glazed square, its glaze in the color of whoever laid it, with a
-   soft gloss on top and a darker foot. On the rack the tiles are unglazed porcelain: nobody's yet. What a square is
-   worth is scratched into it quietly: a dot, three dots, a ring. No pictures, no fonts of its own. */
+/* A parlour game on a card table. The table is green baize (deep where Weave is dark, pale where it's light). On it
+   lies the board: a wooden slab in a darker frame with a bevel, its squares divided by fine inlaid lines, the squares
+   that count more printed on in cream, vermilion and gold, the coordinates gilt into the frame as on a chess board.
+   The tiles are ivory, like dominoes: a top face with a soft light on it, a side one can see, a shadow on the wood;
+   the letter is engraved and filled with the ink of whoever laid it. Beside the board a score pad of ruled paper, with
+   a turned pawn for every player and the points in pencil; what there is to do is on small cards; buttons are brass.
+   No pictures, no fonts of its own: gradients, shadows and the system's serif. */
 :root {
   color-scheme: light dark;
-  --bg: #e6e8eb; --fg: #1b2129; --muted: #626c78; --line: rgb(30 40 55 / .14); --card: #f3f4f6; --lift: #fff;
-  --slate: #b9c0c9; --square: #d5dae0; --square-in: rgb(40 52 68 / .22); --mark: #8a94a1; --tray: #c9cfd6;
-  --accent: #2563d8; --warn: #b4432c; --gold: #b3830c; --ring: #141a22;
-  --bone-1: #fdfdfe; --bone-2: #e3e7ec; --bone-foot: #a9b2bd; --bone-ink: #1c2530;
-  --glaze-top: 76%; --glaze-mid: 64%; --glaze-low: 55%; --glaze-foot: 38%; --glaze-ink: 13%; --glaze-sat: 62%;
+  --serif: Georgia, 'Times New Roman', serif;
+  --pencil: 'Segoe Print', 'Bradley Hand', 'Chalkboard SE', 'Comic Sans MS', cursive;
+  --baize-1: #b9cfb3; --baize-2: #98b79a; --nap: rgb(40 80 50 / .05); --on-table: #1d3a29; --on-table-muted: #4a6b56;
+  --frame-1: #8d5f3c; --frame-2: #5c3a22; --frame-hi: rgb(255 232 195 / .5); --frame-lo: rgb(40 20 8 / .55); --gilt: #f3ddaa;
+  --wood-1: #b68961; --wood-2: #a0714b; --inlay: rgb(62 34 14 / .42); --grain: rgb(70 36 12 / .07);
+  --print-cream: #fbf1d8; --print-gold: #f7dc94; --print-red: #a53a20;
+  --paper: #fcf6e5; --rule: rgb(60 92 140 / .24); --ink: #2a241c; --soft: #6b6253; --graphite: #4a4640; --card: #fffbf0; --card-edge: #cbb98f;
+  --ivory-1: #fffefa; --ivory-2: #f7f0de; --ivory-3: #ebe1c8; --side-1: #d6c9a6; --side-2: #ab9c75; --black-ink: #2b2219;
+  --brass-1: #f3dc97; --brass-2: #cda14a; --brass-3: #8c6820; --brass-ink: #36270a;
+  --rail-1: #d5a871; --rail-2: #ad7f4b; --rail-3: #7a5227;
+  --stamp: #a3311f; --green: #1f5a3a; --gold: #9c7618; --binding: #762a20;
+  --cast: 2px 4px 4px rgb(30 15 5 / .5); --shade: rgb(20 35 22 / .4);
   --s: 34px; /* a square's side: the view sets it from the room it has */
   --side: 130px;
+  --t: calc(var(--s) * .12); /* how thick a tile is, as far as one sees it */
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #131619; --fg: #e9ebef; --muted: #8d96a2; --line: rgb(255 255 255 / .1); --card: #1c2026; --lift: #262b33;
-    --slate: #15181c; --square: #252a31; --square-in: rgb(0 0 0 / .55); --mark: #55606d; --tray: #1c2026;
-    --accent: #77a7ff; --warn: #f0886a; --gold: #e4bb3f; --ring: #f4f6f9;
-    --bone-1: #f1f3f6; --bone-2: #cfd5dc; --bone-foot: #8a94a0; --bone-ink: #1a222c;
-    --glaze-top: 72%; --glaze-mid: 60%; --glaze-low: 50%; --glaze-foot: 32%; --glaze-ink: 10%; --glaze-sat: 58%;
+    --baize-1: #1d4b34; --baize-2: #0e2a1c; --nap: rgb(255 255 255 / .022); --on-table: #f1e8d0; --on-table-muted: #9db7a3;
+    --frame-1: #5d3c26; --frame-2: #2c1a0f; --frame-hi: rgb(255 215 160 / .3); --frame-lo: rgb(0 0 0 / .65); --gilt: #dcc083;
+    --wood-1: #80573a; --wood-2: #68442b; --inlay: rgb(252 224 176 / .25); --grain: rgb(0 0 0 / .1);
+    --print-cream: #f3e6c6; --print-gold: #ecca78; --print-red: #c04a2b;
+    --paper: #f0e7cf; --card: #f5ecd6; --card-edge: #b9a67a;
+    --ivory-1: #fffdf6; --ivory-2: #f4ecd8; --ivory-3: #e6dbc0; --side-1: #cdbf9b; --side-2: #9c8d68;
+    --cast: 2px 4px 5px rgb(0 0 0 / .6); --shade: rgb(0 0 0 / .55);
   }
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { background: var(--bg); scrollbar-width: thin; }
-body { position: relative; margin: 0 auto; padding: 8px; max-width: 100%; color: var(--fg); font: 12.5px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif; user-select: none; -webkit-user-select: none; }
+/* The table: baize, with a little nap and the light falling on its middle. */
+html { min-height: 100%; scrollbar-width: thin; background: repeating-linear-gradient(47deg, var(--nap) 0 1px, transparent 1px 3px), repeating-linear-gradient(-43deg, var(--nap) 0 1px, transparent 1px 4px), radial-gradient(120% 90% at 45% 30%, var(--baize-1), var(--baize-2)); background-attachment: fixed; }
+body { position: relative; margin: 0 auto; padding: 5px; max-width: 100%; color: var(--ink); font: 12.5px/1.35 var(--serif); user-select: none; -webkit-user-select: none; }
 button { font: inherit; color: inherit; border: 0; padding: 0; background: none; cursor: pointer; }
 button:disabled { cursor: default; }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--brass-1); outline-offset: 1px; }
 .gap { flex: 1; }
 
-/* A person: their initials on their color (the frame gets no pictures of them). */
-.chip { flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: hsl(var(--h) 55% 46%); color: #fff; font: 700 9px/1 system-ui, sans-serif; letter-spacing: .02em; }
-.chip.small { width: 15px; height: 15px; font-size: 7px; }
+/* A player: a turned wooden pawn in their color (the frame gets no pictures of them). */
+.pawn { position: relative; flex: none; display: inline-block; width: 13px; height: 19px; filter: drop-shadow(0 1px 1px rgb(0 0 0 / .35)); }
+.pawn::before { content: ''; position: absolute; left: 3px; top: 0; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, hsl(var(--h) 60% 70%), hsl(var(--h) 62% 42%) 65%, hsl(var(--h) 62% 30%)); }
+.pawn::after { content: ''; position: absolute; left: 0; bottom: 0; width: 13px; height: 13.5px; border-radius: 0 0 2px 2px; background: linear-gradient(90deg, hsl(var(--h) 55% 56%), hsl(var(--h) 62% 40%) 55%, hsl(var(--h) 62% 27%)); clip-path: polygon(36% 0, 64% 0, 76% 62%, 100% 80%, 100% 100%, 0 100%, 0 80%, 24% 62%); }
+.pawn.small { width: 9px; height: 13px; }
+.pawn.small::before { left: 2px; width: 5px; height: 5px; }
+.pawn.small::after { width: 9px; height: 9.5px; }
 
 /* ---------------------------------------------------------------- the line on top */
-#top { display: flex; align-items: center; gap: 8px; height: 26px; margin-bottom: 6px; }
-#title { margin: 0; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; }
-#bag { flex: none; color: var(--muted); font-size: 11.5px; white-space: nowrap; }
-#all { flex: none; padding: 3px 9px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 11.5px; }
-#all:hover { background: var(--lift); }
+#top { display: flex; align-items: baseline; gap: 7px; height: 24px; margin-bottom: 4px; padding: 0 2px; color: var(--on-table); }
+#title { margin: 0; font: 700 16px/24px var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; }
+#bag { flex: none; color: var(--on-table-muted); font-size: 11.5px; font-style: italic; white-space: nowrap; }
+/* Brass: a small engraved plate. */
+#all, #play, #start, .acts .go, #recall, #shuffle { color: var(--brass-ink); background: linear-gradient(175deg, var(--brass-1), var(--brass-2) 70%, #b98c38); box-shadow: inset 0 1px 0 rgb(255 255 255 / .55), inset 0 -1px 0 var(--brass-3), 0 1px 2px var(--shade); text-shadow: 0 1px 0 rgb(255 255 255 / .4); }
+#all { flex: none; align-self: center; padding: 3px 9px 2px; border-radius: 3px; font: 700 10px/1.4 var(--serif); letter-spacing: .08em; text-transform: uppercase; }
+#all:hover, #play:hover:not(:disabled), #start:hover, #recall:hover:not(:disabled), #shuffle:hover:not(:disabled) { filter: brightness(1.07); }
 
-/* ---------------------------------------------------------------- the table: board, beside it the players, under it the rack */
-#table { display: grid; grid-template-columns: auto var(--side); grid-template-areas: 'board side' 'hand hand'; gap: 6px 10px; }
-#board { grid-area: board; position: relative; display: grid; grid-template-columns: repeat(11, var(--s)); grid-auto-rows: var(--s); gap: 1px; border-radius: 7px; background: var(--slate); touch-action: manipulation; }
-.cell { position: relative; border-radius: 4px; background: var(--square); box-shadow: inset 0 1px 2px var(--square-in); }
-.cell.over { box-shadow: inset 0 0 0 2px var(--accent); }
+/* ---------------------------------------------------------------- the table: board, beside it the score pad, under it the rack */
+#table { display: grid; grid-template-columns: auto var(--side); grid-template-areas: 'board side' 'hand hand'; gap: 5px 8px; }
+/* The board: a frame with a bevel, the coordinates gilt into it; in it the field, a little lower than the frame. */
+#board { grid-area: board; position: relative; padding: 13px 5px 5px 13px; border-radius: 5px; background: repeating-linear-gradient(1deg, var(--grain) 0 1px, transparent 1px 4px), linear-gradient(135deg, var(--frame-1), var(--frame-2)); box-shadow: inset 1px 1px 0 var(--frame-hi), inset -1px -1px 0 var(--frame-lo), 0 5px 12px var(--shade), 0 1px 2px var(--shade); }
+#cols, #rows { position: absolute; display: grid; place-items: center; color: var(--gilt); font: 700 8px/1 var(--serif); opacity: .85; pointer-events: none; }
+#cols { left: 13px; top: 0; height: 13px; grid-template-columns: repeat(11, var(--s)); }
+#rows { left: 0; top: 13px; width: 13px; grid-template-rows: repeat(11, var(--s)); }
+#field { position: relative; display: grid; grid-template-columns: repeat(11, var(--s)); grid-auto-rows: var(--s); touch-action: manipulation; background: repeating-linear-gradient(91deg, var(--grain) 0 1px, transparent 1px 5px, var(--grain) 5px 6px, transparent 6px 13px), linear-gradient(100deg, var(--wood-1), var(--wood-2)); box-shadow: 0 0 0 1px var(--frame-lo), 0 0 0 2px var(--frame-hi), inset 1px 1px 3px rgb(0 0 0 / .35); }
+/* A square: fine inlaid lines to its right and under it. */
+.cell { position: relative; box-shadow: inset -1px -1px 0 var(--inlay); }
 .cell.free { cursor: pointer; }
-/* What a square is worth: a dot (the letter counts double), three dots (three times), a ring (the word counts double); a diamond is the middle. */
-.cell::before, .mark { content: ''; position: absolute; inset: 0; margin: auto; }
-.cell.dl::before, .mark.dl { width: 5px; height: 5px; border-radius: 50%; background: var(--mark); }
-.cell.tl::before, .mark.tl { width: 13px; height: 12px; background: radial-gradient(circle at 50% 2.5px, var(--mark) 2.3px, transparent 2.8px), radial-gradient(circle at 2.5px 9.5px, var(--mark) 2.3px, transparent 2.8px), radial-gradient(circle at 10.5px 9.5px, var(--mark) 2.3px, transparent 2.8px); }
-.cell.dw::before, .mark.dw { width: 12px; height: 12px; border-radius: 50%; border: 1.6px solid var(--mark); }
-.cell.mid::before { width: 9px; height: 9px; rotate: 45deg; border: 1.6px solid var(--mark); border-radius: 1px; }
-.mark { position: relative; display: inline-block; inset: auto; margin: 0 1px 0 2px; vertical-align: -1px; }
+.cell.over { background: rgb(255 240 200 / .22); }
+/* What a square is worth, printed on it: a small square is a tile (its letter counts 2 or 3 times), a long shape is a word (it counts twice). The middle: a gilt lozenge. */
+.cell::before, .mark { position: absolute; inset: 0; margin: auto; display: grid; place-items: center; font: 700 calc(var(--s) * .27)/1 var(--serif); }
+.cell.dl::before { content: '2'; }
+.cell.tl::before { content: '3'; }
+.cell.dw::before { content: '×2'; }
+.cell.dl::before, .mark.dl { width: 46%; height: 46%; border: 1.3px solid var(--print-cream); border-radius: 3px; color: var(--print-cream); opacity: .85; }
+.cell.tl::before, .mark.tl { width: 46%; height: 46%; border: 1.3px solid var(--print-cream); border-radius: 3px; color: var(--print-cream); background: var(--print-red); opacity: .92; }
+.cell.dw::before, .mark.dw { width: 76%; height: 42%; border: 1.3px solid var(--print-gold); border-radius: 999px; color: var(--print-gold); opacity: .9; }
+.cell.mid::before { content: ''; width: 32%; height: 32%; rotate: 45deg; border: 3px double var(--print-gold); opacity: .9; }
+/* The last move: a ring of light on the board under its tiles. */
+.cell.lit { z-index: 1; box-shadow: inset -1px -1px 0 var(--inlay), inset 0 0 0 2px rgb(255 222 130 / .95), 0 0 7px 2px rgb(255 214 110 / .6); background: rgb(255 226 140 / .3); }
+/* Under a tile of mine that lies there tentatively: a dashed mark, red if the move is not legal. */
+.cell.under { outline: 1.5px dashed var(--print-cream); outline-offset: -1.5px; }
+.cell.under.bad { outline-color: #ff8e6e; }
 
-/* ---------------------------------------------------------------- a tile */
-.tile { position: relative; display: grid; place-items: center; width: calc(var(--s) - 2px); height: calc(var(--s) - 2px); margin: 1px; border-radius: 19%; font: 800 calc(var(--s) * .54)/1 system-ui, -apple-system, "Segoe UI", sans-serif; touch-action: none;
-  color: var(--bone-ink); background: linear-gradient(165deg, var(--bone-1), var(--bone-2)); box-shadow: inset 0 1px 0 #fff, inset 0 calc(var(--s) * -.08) 0 var(--bone-foot), 0 1px 2px rgb(0 0 0 / .45); }
-/* Laid: glazed in the color of who laid it. */
-.tile.laid { color: hsl(var(--h) 45% var(--glaze-ink)); background: linear-gradient(165deg, hsl(var(--h) var(--glaze-sat) var(--glaze-top)), hsl(var(--h) var(--glaze-sat) var(--glaze-mid)) 55%, hsl(var(--h) var(--glaze-sat) var(--glaze-low)));
-  box-shadow: inset 0 1px 0 hsl(var(--h) 85% 88% / .9), inset 0 calc(var(--s) * -.08) 0 hsl(var(--h) 52% var(--glaze-foot)), 0 1px 2px rgb(0 0 0 / .5); }
-/* The gloss: a soft light on the upper half. */
-.tile::after { content: ''; position: absolute; inset: 7% 9% auto 9%; height: 36%; border-radius: 45% 45% 60% 60% / 55% 55% 45% 45%; background: linear-gradient(rgb(255 255 255 / .42), rgb(255 255 255 / 0)); pointer-events: none; }
-.tile b { position: absolute; right: 10%; bottom: 13%; font: 700 calc(var(--s) * .235)/1 system-ui, sans-serif; opacity: .78; }
-.tile.last { box-shadow: inset 0 1px 0 hsl(var(--h) 85% 88% / .9), inset 0 calc(var(--s) * -.08) 0 hsl(var(--h) 52% var(--glaze-foot)), 0 0 0 2px var(--ring), 0 2px 6px rgb(0 0 0 / .5); z-index: 1; }
-/* Mine, lying there tentatively: lifted a little, with a dashed edge; red if the move is not legal. */
-.tile.mine { cursor: grab; outline: 2px dashed var(--ring); outline-offset: -1px; translate: 0 -2px; box-shadow: inset 0 1px 0 hsl(var(--h) 85% 88% / .9), inset 0 calc(var(--s) * -.08) 0 hsl(var(--h) 52% var(--glaze-foot)), 0 5px 8px rgb(0 0 0 / .45); z-index: 2; }
-.tile.mine.bad { outline-color: var(--warn); }
-.tile.mine.sending { outline-style: solid; animation: breathe .8s ease-in-out infinite alternate; }
-.tile.dragging { z-index: 20; cursor: grabbing; pointer-events: none; scale: 1.12; box-shadow: inset 0 1px 0 #fff, inset 0 calc(var(--s) * -.08) 0 var(--bone-foot), 0 10px 18px rgb(0 0 0 / .5); transition: scale .1s; }
+/* ---------------------------------------------------------------- a tile: ivory, with a top face, a side and a shadow */
+.tile { position: relative; z-index: 2; display: grid; place-items: center; width: calc(var(--s) - 4px); height: calc(var(--s) - 4px); margin: 2px; padding: 0 2px var(--t) 0; touch-action: none; color: var(--black-ink); font: 700 calc(var(--s) * .56)/1 var(--serif); text-shadow: 0 1px 0 rgb(255 255 255 / .9); }
+/* Its side, seen from above and from the left: under and to the right of the face; and the shadow it casts on the board. */
+.tile::before { content: ''; position: absolute; z-index: -1; inset: var(--t) 0 0 2px; border-radius: 5px 5px 6px 6px; background: linear-gradient(0deg, rgb(95 75 35 / .4), rgb(95 75 35 / 0) 5px), linear-gradient(90deg, var(--side-1) calc(100% - 4px), var(--side-2)); box-shadow: var(--cast), inset 0 -1px 0 rgb(0 0 0 / .2); }
+/* Its face: lighter at its upper edge, with a soft light on its upper left. */
+.tile::after { content: ''; position: absolute; z-index: -1; inset: 0 2px var(--t) 0; border-radius: 5px; background: radial-gradient(90% 70% at 28% 18%, rgb(255 255 255 / .95), rgb(255 255 255 / 0) 60%), linear-gradient(165deg, var(--ivory-1), var(--ivory-2) 55%, var(--ivory-3)); box-shadow: inset 0 1px 0 #fff, inset 1px 0 0 rgb(255 255 255 / .8), inset 0 -1px 0 rgb(125 105 60 / .28), inset -1px 0 0 rgb(125 105 60 / .2); }
+.tile b { position: absolute; right: calc(11% + 2px); bottom: calc(9% + var(--t)); font: 700 calc(var(--s) * .235)/1 var(--serif); opacity: .8; text-shadow: none; }
+/* A value of two digits (Z, Q): the letter makes room for it. */
+.tile.two { padding-right: calc(2px + 20%); }
+.tile.two b { right: calc(5% + 2px); font-size: calc(var(--s) * .205); letter-spacing: -.4px; }
+/* Laid: its letter filled with the ink of who laid it. */
+.tile.laid { color: hsl(var(--h) 78% 31%); }
+/* Mine, lying there tentatively: not pressed down yet. */
+.tile.mine { cursor: grab; translate: 0 -3px; }
+.tile.mine::before { box-shadow: 3px 7px 6px rgb(0 0 0 / .42); }
+.tile.mine.sending { animation: breathe .8s ease-in-out infinite alternate; }
+/* In the hand: it lifts and tilts a little. */
+.tile.dragging { z-index: 20; cursor: grabbing; pointer-events: none; scale: 1.1; rotate: 5deg; transition: scale .1s, rotate .1s; }
+.tile.dragging::before, .tile.ghost::before { box-shadow: 7px 15px 12px rgb(0 0 0 / .32); }
 .tile.wait { visibility: hidden; }
 .tile.ghost { position: fixed; margin: 0; z-index: 30; pointer-events: none; }
 #fly { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
 
-/* What my tiles would count, at the end of the word they make. */
-.sum { position: absolute; z-index: 5; padding: 1px 6px; border-radius: 999px; background: var(--accent); color: #fff; font: 700 11px/1.5 system-ui, sans-serif; box-shadow: 0 2px 6px rgb(0 0 0 / .4); pointer-events: none; translate: -30% -55%; white-space: nowrap; }
-@media (prefers-color-scheme: dark) { .sum { color: #0c1422; } }
-/* Who made the move that just arrived, at its word. */
-.flag { position: absolute; z-index: 6; display: flex; align-items: center; gap: 5px; padding: 3px 9px 3px 3px; border-radius: 999px; background: var(--lift); color: var(--fg); font-size: 11.5px; font-weight: 600; white-space: nowrap; box-shadow: 0 0 0 1.5px hsl(var(--h) 60% 55%), 0 4px 12px rgb(0 0 0 / .45); pointer-events: none; animation: flag 3.6s both; animation-delay: var(--wait, 0ms); }
-.flag em { font-style: normal; font-weight: 800; color: hsl(var(--h) 60% 45%); }
-.flag small { font-weight: 500; color: var(--muted); }
-@media (prefers-color-scheme: dark) { .flag em { color: hsl(var(--h) 70% 70%); } }
+/* What my tiles would count: a brass counter at the end of the word they make. */
+.sum { position: absolute; z-index: 5; padding: 1px 6px 0; border-radius: 999px; color: var(--brass-ink); background: linear-gradient(175deg, var(--brass-1), var(--brass-2)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .6), inset 0 -1px 0 var(--brass-3), 0 2px 4px rgb(0 0 0 / .45); font: 700 11px/1.5 var(--serif); pointer-events: none; translate: -45% -50%; white-space: nowrap; }
+/* Who made the move that just arrived: a paper slip at its word. */
+.flag { position: absolute; z-index: 6; display: flex; align-items: center; gap: 5px; padding: 2px 8px 2px 6px; border-radius: 2px; rotate: -2deg; background: var(--card); border: 1px solid var(--card-edge); color: var(--ink); font-size: 11.5px; font-weight: 700; white-space: nowrap; box-shadow: 0 3px 7px rgb(0 0 0 / .4); pointer-events: none; animation: flag 3.6s both; animation-delay: var(--wait, 0ms); }
+.flag em { font: 700 12px var(--pencil); color: hsl(var(--h) 70% 32%); }
+.flag small { font-weight: 400; font-style: italic; color: var(--soft); }
 
-/* ---------------------------------------------------------------- the rack */
-#hand { grid-area: hand; display: flex; align-items: center; gap: 6px; min-height: calc(var(--s) + 6px); }
-#rack { display: flex; gap: 3px; padding: 3px; border-radius: 9px; background: var(--tray); box-shadow: inset 0 1px 2px var(--square-in); }
-.slot { width: var(--s); height: var(--s); border-radius: 6px; }
-.slot.out { box-shadow: inset 0 0 0 1.5px var(--line); }
+/* ---------------------------------------------------------------- the rack: a wooden rail the tiles lean on */
+#hand { grid-area: hand; display: flex; align-items: center; gap: 6px; min-height: calc(var(--s) + 8px); color: var(--on-table-muted); font-style: italic; }
+#rack { display: flex; padding: 2px 5px 6px; border-radius: 4px; background: repeating-linear-gradient(0deg, rgb(80 45 15 / .06) 0 1px, transparent 1px 3px), linear-gradient(var(--rail-1), var(--rail-2) calc(100% - 7px), var(--rail-3) calc(100% - 7px), var(--rail-2) calc(100% - 5px), var(--rail-1)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .4), inset 0 -1px 0 rgb(0 0 0 / .3), 0 3px 6px var(--shade); }
+.slot { width: var(--s); height: var(--s); }
+.slot.out { background: radial-gradient(closest-side, rgb(60 30 5 / .2), transparent); }
 #rack .tile { cursor: grab; }
-#rack .tile.picked { translate: 0 -5px; box-shadow: inset 0 1px 0 #fff, inset 0 calc(var(--s) * -.08) 0 var(--bone-foot), 0 0 0 2px var(--accent), 0 6px 10px rgb(0 0 0 / .4); }
-#rack.locked .tile { cursor: not-allowed; filter: brightness(.82); }
-#recall, #shuffle { flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 15px; line-height: 1; }
-#recall:hover:not(:disabled), #shuffle:hover:not(:disabled) { background: var(--lift); }
-#recall:disabled, #shuffle:disabled { opacity: .35; }
-#over { color: var(--muted); }
-#play { flex: none; width: var(--side); height: 32px; border-radius: 9px; background: var(--accent); color: #fff; font-weight: 700; font-size: 13.5px; box-shadow: inset 0 -2px 0 rgb(0 0 0 / .22); }
-@media (prefers-color-scheme: dark) { #play { color: #0c1422; } }
-#play:disabled { background: var(--card); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
+#rack .tile::before { box-shadow: 1px 2px 2px rgb(40 20 5 / .45); }
+#rack .tile.picked { translate: 0 -6px; }
+#rack .tile.picked::before { box-shadow: 3px 9px 7px rgb(40 20 5 / .4), 0 0 0 1.5px var(--brass-1); }
+#rack.locked .tile { cursor: not-allowed; filter: brightness(.9) saturate(.85); }
+#recall, #shuffle { flex: none; width: 26px; height: 26px; border-radius: 50%; font: 700 14px/1 system-ui, sans-serif; font-style: normal; }
+#recall:disabled, #shuffle:disabled { opacity: .4; }
+#play { flex: none; width: var(--side); height: 32px; border-radius: 4px; font: 700 13px var(--serif); font-style: normal; letter-spacing: .02em; }
+#play:disabled { color: rgb(45 35 15 / .55); background: linear-gradient(175deg, #a3946f, #7d6e4b); text-shadow: none; }
 #play.asking { animation: breathe .8s ease-in-out infinite alternate; }
 
-/* ---------------------------------------------------------------- beside the board */
-#side { grid-area: side; display: flex; flex-direction: column; gap: 6px; min-width: 0; height: calc(var(--s) * 11 + 10px); }
-#players { flex: none; display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
-#players li { position: relative; display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 6px; height: 25px; padding: 0 7px 0 4px; border-radius: 8px; }
-#players .who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-#players .who small { font-weight: 400; color: var(--muted); }
-#players .score { font: 700 14px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; }
-#players li.turn { background: color-mix(in srgb, hsl(var(--h) 60% 55%) 24%, transparent); box-shadow: inset 0 0 0 1.5px hsl(var(--h) 60% 55%); }
-#players li.turn .chip { animation: beat 1.4s ease-in-out infinite; }
-#players li.won { background: color-mix(in srgb, var(--gold) 22%, transparent); box-shadow: inset 0 0 0 1.5px var(--gold); }
-#players li.won .score::before { content: '★ '; color: var(--gold); font-size: 11px; }
-#players .gain { position: absolute; right: 6px; top: -3px; font: 800 12px/1 system-ui, sans-serif; color: hsl(var(--h) 60% 45%); pointer-events: none; animation: gain 1.5s ease-out both; animation-delay: var(--wait, 0ms); }
-#players .gain.loss { color: var(--warn); }
-@media (prefers-color-scheme: dark) { #players .gain { color: hsl(var(--h) 75% 72%); } }
+/* ---------------------------------------------------------------- beside the board: the score pad, two cards, the pad's lines */
+#side { grid-area: side; display: flex; flex-direction: column; gap: 5px; min-width: 0; height: calc(var(--s) * 11 + 18px); }
+/* The score pad: ruled paper under a cloth binding; a pawn for every player, the points in pencil, the leader underlined. */
+#players { position: relative; flex: none; display: grid; margin: 0; padding: 8px 6px 2px 4px; list-style: none; border-radius: 3px 3px 2px 2px; background: var(--paper); box-shadow: 0 2px 5px var(--shade); }
+#players::before { content: ''; position: absolute; inset: 0 0 auto; height: 6px; border-radius: 3px 3px 0 0; background: repeating-linear-gradient(90deg, rgb(0 0 0 / .12) 0 1px, transparent 1px 3px), var(--binding); }
+#players li { position: relative; display: grid; grid-template-columns: 8px 13px 1fr auto; align-items: center; gap: 4px; height: 23px; border-bottom: 1px solid var(--rule); }
+#players li:last-child { border-bottom: 0; }
+/* Whose turn it is: a small brass pointer beside the name. */
+#players li::before { content: ''; }
+#players li.turn::before { width: 0; height: 0; border-left: 7px solid var(--brass-2); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; filter: drop-shadow(0 1px 0 var(--brass-3)); animation: point 1.3s ease-in-out infinite; }
+#players .who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#players li.turn .who { font-weight: 700; }
+#players .who small { font-style: italic; color: var(--soft); }
+#players .score { font: 700 14.5px/1 var(--pencil); color: var(--graphite); font-variant-numeric: tabular-nums; }
+#players li.lead .score { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
+/* Who won: a small gilt rosette. */
+#players li.won::before { width: 7px; height: 7px; margin-left: 2px; border-radius: 50%; background: radial-gradient(circle, var(--brass-1) 0 30%, var(--brass-2) 34% 100%); box-shadow: 0 0 0 1px var(--brass-3), 0 0 0 2.5px var(--brass-1), 0 0 0 3.2px var(--brass-3); }
+#players li.won .who { font-weight: 700; }
+#players .gain { position: absolute; right: 2px; top: -5px; font: 700 11px/1 var(--pencil); color: hsl(var(--h) 70% 32%); pointer-events: none; animation: gain 1.6s ease-out both; animation-delay: var(--wait, 0ms); }
+#players .gain.loss { color: var(--stamp); }
 
-#now, #last { flex: none; padding: 6px 8px; border-radius: 9px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 11.5px; color: var(--muted); }
-#now h2, #last h2 { margin: 0 0 1px; font-size: 13px; line-height: 1.25; color: var(--fg); }
+/* What there is to do, and the last move: two small cards. */
+#now, #last { flex: none; padding: 5px 8px 6px; border-radius: 3px; background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge), 0 2px 4px var(--shade); font-size: 11.5px; color: var(--soft); }
+#now h2, #last h2 { margin: 0 0 1px; font: 700 13px/1.25 var(--serif); color: var(--ink); }
 #now p, #last p { margin: 0; }
-#now.mine { box-shadow: inset 0 0 0 1.5px var(--accent); }
-#now.mine h2 { color: var(--accent); }
-#now.bad { box-shadow: inset 0 0 0 1.5px var(--warn); }
-#now.bad h2 { color: var(--warn); }
-#now.over { box-shadow: inset 0 0 0 1.5px var(--gold); }
+#now.mine { box-shadow: inset 0 0 0 1.5px var(--green), inset 0 0 0 3px var(--card), inset 0 0 0 3.5px var(--green), 0 2px 4px var(--shade); }
+#now.mine h2 { color: var(--green); }
+#now.bad { box-shadow: inset 0 0 0 1.5px var(--stamp), 0 2px 4px var(--shade); }
+#now.bad h2 { color: var(--stamp); }
+#now.over { box-shadow: inset 0 0 0 1.5px var(--gold), inset 0 0 0 3px var(--card), inset 0 0 0 3.5px var(--gold), 0 2px 4px var(--shade); }
 #now.over h2 { color: var(--gold); }
 #now.nudge { animation: shake .4s; }
-#now .words { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; margin: 0; color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
-#now .words dd { margin: 0; text-align: right; }
-#now .words .total { border-top: 1px solid var(--line); margin-top: 2px; padding-top: 1px; font-weight: 800; }
-.acts { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-.acts button { padding: 2px 9px; border-radius: 999px; background: var(--lift); box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-size: 11.5px; font-weight: 600; }
-.acts button:hover:not(:disabled) { box-shadow: inset 0 0 0 1px var(--muted); }
-.acts button:disabled { opacity: .4; }
-.acts button.go { background: var(--accent); color: #fff; box-shadow: none; }
-.acts button.doubt { background: none; color: var(--warn); box-shadow: inset 0 0 0 1.5px var(--warn); }
-.acts button.doubt:hover:not(:disabled) { background: color-mix(in srgb, var(--warn) 14%, transparent); box-shadow: inset 0 0 0 1.5px var(--warn); }
-.acts button.sure { background: var(--warn); color: #fff; box-shadow: none; }
-@media (prefers-color-scheme: dark) { .acts button.go, .acts button.sure { color: #0c1422; } }
-#last .line { display: flex; align-items: center; gap: 5px; color: var(--fg); font-weight: 600; white-space: nowrap; }
-#last .line b { font-size: 14px; font-weight: 800; color: hsl(var(--h) 60% 42%); }
-@media (prefers-color-scheme: dark) { #last .line b { color: hsl(var(--h) 75% 72%); } }
-#last .word { display: block; margin-top: 1px; font: 800 14px/1.3 system-ui, sans-serif; letter-spacing: .1em; color: var(--fg); overflow: hidden; text-overflow: ellipsis; }
-#last .word small { margin-left: 6px; font-size: 11px; font-weight: 500; letter-spacing: 0; color: var(--muted); }
-#last.taken .word { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--warn); color: var(--muted); }
-#last .doubts { display: flex; align-items: center; flex-wrap: wrap; gap: 3px; margin-top: 3px; color: var(--warn); font-weight: 600; }
-#last.pop { animation: pop .35s; }
+#now .words { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; margin: 0; color: var(--ink); font-weight: 700; letter-spacing: .03em; }
+#now .words dd { margin: 0; text-align: right; font: 700 12px/1.3 var(--pencil); color: var(--graphite); }
+#now .words .total { border-top: 1px solid var(--ink); margin-top: 2px; padding-top: 1px; letter-spacing: 0; font-style: italic; }
+/* What one can do: plain printed labels; what matters most in brass; a doubt is a stamp. */
+.acts { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 5px; }
+.acts button { padding: 2px 7px 1px; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--ink); color: var(--ink); font: 700 9.5px/1.4 var(--serif); letter-spacing: .08em; text-transform: uppercase; }
+.acts button:hover:not(:disabled) { background: rgb(60 45 20 / .08); }
+.acts button:disabled { opacity: .35; }
+.acts button.go { padding: 3px 10px 2px; }
+.acts button.doubt { rotate: -3deg; padding: 2px 8px 1px; border-radius: 3px; color: var(--stamp); box-shadow: inset 0 0 0 1.6px var(--stamp), inset 0 0 0 2.6px var(--card), inset 0 0 0 3.2px rgb(163 49 31 / .5); background: rgb(163 49 31 / .05); font-size: 10px; letter-spacing: .12em; }
+.acts button.doubt:hover:not(:disabled) { background: rgb(163 49 31 / .12); }
+.acts button.sure { color: #fff; background: var(--stamp); box-shadow: none; }
+#last .line { display: flex; align-items: center; gap: 5px; color: var(--ink); font-weight: 700; white-space: nowrap; }
+#last .line b { font: 700 13.5px/1 var(--pencil); color: hsl(var(--h) 70% 32%); }
+#last .word { display: block; margin-top: 1px; font: 700 14px/1.3 var(--serif); letter-spacing: .12em; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#last .word small { margin-left: 6px; font-size: 10.5px; font-weight: 400; font-style: italic; letter-spacing: 0; color: var(--soft); }
+#last.taken .word { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--stamp); color: var(--soft); }
+#last .doubts { margin-top: 2px; color: var(--stamp); font-style: italic; }
+#last.pop { animation: card .35s; }
 
-#moves { flex: 1; min-height: 0; margin: 0; padding: 0 2px 0 0; list-style: none; overflow-y: auto; scrollbar-width: thin; font-size: 11.5px; }
-#moves li { display: flex; align-items: center; gap: 5px; height: 19px; white-space: nowrap; }
-#moves i { flex: none; width: 8px; height: 8px; border-radius: 3px; background: hsl(var(--h) 58% 55%); }
-#moves .n { flex: none; width: 13px; text-align: right; color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
-#moves .what { flex: 1; overflow: hidden; text-overflow: ellipsis; font-weight: 600; letter-spacing: .03em; }
-#moves .what.soft { font-weight: 400; letter-spacing: 0; color: var(--muted); }
-#moves .what s { color: var(--muted); text-decoration-color: var(--warn); }
-#moves small { color: var(--muted); font-weight: 400; letter-spacing: 0; }
-#moves .points { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* All moves, the latest first: lines on the pad. */
+#moves { flex: 1; min-height: 0; margin: 0; padding: 0 5px 0 3px; list-style: none; overflow-y: auto; scrollbar-width: thin; border-radius: 2px; background: repeating-linear-gradient(transparent 0 18px, var(--rule) 18px 19px) local, var(--paper); box-shadow: 0 2px 5px var(--shade); font-size: 11px; color: var(--ink); }
+#moves:empty { display: none; }
+#moves li { display: flex; align-items: center; gap: 4px; height: 19px; white-space: nowrap; }
+#moves i { flex: none; width: 6px; height: 6px; border-radius: 50%; background: hsl(var(--h) 65% 38%); }
+#moves .n { flex: none; width: 13px; text-align: right; color: var(--soft); font-size: 9.5px; font-variant-numeric: tabular-nums; }
+#moves .what { flex: 1; overflow: hidden; text-overflow: ellipsis; font-weight: 700; letter-spacing: .05em; }
+#moves .what.soft { font-weight: 400; font-style: italic; letter-spacing: 0; color: var(--soft); }
+#moves .what s { color: var(--soft); text-decoration-color: var(--stamp); }
+#moves small { color: var(--soft); font-weight: 400; font-style: italic; letter-spacing: 0; }
+#moves .points { flex: none; font: 700 11px/1 var(--pencil); color: var(--graphite); font-variant-numeric: tabular-nums; }
 
-/* ---------------------------------------------------------------- all games, and a new one */
-#games { position: absolute; z-index: 40; top: 38px; right: 8px; width: min(330px, calc(100% - 16px)); max-height: calc(100vh - 50px); overflow-y: auto; padding: 8px; border-radius: 12px; background: var(--lift); box-shadow: 0 0 0 1px var(--line), 0 12px 32px rgb(0 0 0 / .45); }
+/* ---------------------------------------------------------------- all games, and a new one: a sheet of the rules' paper */
+#games { position: absolute; z-index: 40; top: 32px; right: 5px; width: min(330px, calc(100% - 10px)); max-height: calc(100vh - 44px); overflow-y: auto; padding: 8px; border-radius: 3px; background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge), 0 10px 28px rgb(0 0 0 / .5); }
 #games.alone { position: static; width: auto; max-width: 420px; margin: 30px auto 0; }
-#none { margin: 2px 2px 8px; font-size: 15px; }
+#none { margin: 2px 2px 8px; font: 700 15px var(--serif); }
 #games:not(.alone) #none { display: none; }
-#list { margin: 0 0 6px; padding: 0; list-style: none; display: grid; gap: 3px; }
-#list li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 8px; padding: 5px 8px; border-radius: 8px; cursor: pointer; }
-#list li:hover { background: var(--card); }
-#list li.shown { box-shadow: inset 0 0 0 1.5px var(--accent); }
+#list { margin: 0 0 6px; padding: 0; list-style: none; display: grid; }
+#list li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1px 8px; padding: 5px 6px; border-bottom: 1px solid var(--rule); cursor: pointer; }
+#list li:hover { background: rgb(60 45 20 / .06); }
+#list li.shown { box-shadow: inset 3px 0 0 var(--green); }
 #list .name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#list .about { grid-column: 1; display: flex; align-items: center; gap: 3px; color: var(--muted); font-size: 11.5px; }
+#list .about { grid-column: 1; display: flex; align-items: center; gap: 3px; color: var(--soft); font-size: 11.5px; font-style: italic; }
 #list .acts { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
 #new { display: flex; gap: 6px; }
-#name { flex: 1; min-width: 0; padding: 5px 9px; border: 0; border-radius: 8px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font: inherit; user-select: text; -webkit-user-select: text; }
-#start { flex: none; padding: 0 12px; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 700; }
-@media (prefers-color-scheme: dark) { #start { color: #0c1422; } }
-#how { margin: 8px 2px 2px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+#name { flex: 1; min-width: 0; padding: 5px 4px 3px; border: 0; border-bottom: 1.5px solid var(--ink); border-radius: 0; background: none; color: var(--ink); font: inherit; user-select: text; -webkit-user-select: text; }
+#name::placeholder { color: var(--soft); font-style: italic; }
+#start { flex: none; padding: 0 12px; border-radius: 3px; font: 700 10.5px var(--serif); letter-spacing: .08em; text-transform: uppercase; }
+#how { margin: 8px 2px 2px; color: var(--soft); font-size: 11px; line-height: 1.9; }
+/* The marks in the legend: each on a small piece of the board's wood. */
+.mark { position: relative; display: inline-grid; inset: auto; margin: 0 3px 0 4px; vertical-align: -4px; width: 15px !important; height: 15px !important; font-size: 9px; font-style: normal; opacity: 1 !important; outline: 2.5px solid var(--wood-2); background-color: var(--wood-2); }
+.mark.tl { background-color: var(--print-red); }
+.mark.dw { width: 26px !important; height: 14px !important; }
 
-#status { position: fixed; z-index: 50; left: 50%; bottom: 8px; translate: -50% 0; max-width: calc(100% - 24px); margin: 0; padding: 5px 12px; border-radius: 999px; background: var(--warn); color: #fff; font-weight: 600; font-size: 12px; box-shadow: 0 4px 14px rgb(0 0 0 / .4); }
+#status { position: fixed; z-index: 50; left: 50%; bottom: 8px; translate: -50% 0; max-width: calc(100% - 24px); margin: 0; padding: 4px 12px; border-radius: 2px; background: var(--card); color: var(--stamp); box-shadow: inset 0 0 0 1.5px var(--stamp), 0 4px 12px rgb(0 0 0 / .45); font-weight: 700; font-size: 12px; }
 #status:empty { display: none; }
 
 /* ---------------------------------------------------------------- motion */
-/* A tile lands with a small clack: it comes down a little too far and settles. */
-.tile.land { animation: land .34s cubic-bezier(.3, 1.4, .5, 1) both; animation-delay: calc(var(--i, 0) * 110ms); }
-.tile.clack { animation: clack .26s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: var(--wait, 0ms); }
+/* A tile drops onto the board with some weight: a short fall, a tiny bounce, and its shadow tightens under it. */
+.tile.land { animation: drop .4s cubic-bezier(.45, 0, .85, .65) both; animation-delay: calc(var(--i, 0) * 110ms); }
+.tile.land::before { animation: tighten .4s both; animation-delay: calc(var(--i, 0) * 110ms); }
+/* One that lay there tentatively, or came over from the rack, is pressed down: the clack. */
+.tile.clack { animation: clack .28s cubic-bezier(.45, 0, .85, .65) both; animation-delay: var(--wait, 0ms); }
+.tile.clack::before { animation: tighten-a-little .28s both; animation-delay: var(--wait, 0ms); }
 /* Then the whole word lifts for a moment, letter after letter. */
 .tile.lift { animation: lift .5s ease-in-out both; animation-delay: calc(var(--wait, 0ms) + var(--i, 0) * 45ms); }
-.tile.pop { animation: pop .3s cubic-bezier(.3, 1.5, .5, 1) both; animation-delay: var(--wait, 0ms); }
+.tile.lift::before { animation: loosen .5s ease-in-out both; animation-delay: calc(var(--wait, 0ms) + var(--i, 0) * 45ms); }
+/* A new tile on the rack slides down onto the rail. */
+.tile.pop { animation: slide .3s cubic-bezier(.3, 1.3, .5, 1) both; animation-delay: var(--wait, 0ms); }
 .tile.wobble { animation: shake .45s both; }
-@keyframes land { from { scale: 1.5; translate: 0 -12px; opacity: 0; } 55% { scale: .9; translate: 0 0; opacity: 1; } 78% { scale: 1.05; } to { scale: 1; } }
-@keyframes clack { from { scale: 1.16; } 55% { scale: .92; } to { scale: 1; } }
-@keyframes lift { 0%, 100% { translate: 0 0; } 45% { translate: 0 -5px; filter: brightness(1.15); } }
-@keyframes pop { from { scale: 0; opacity: 0; } to { scale: 1; opacity: 1; } }
+@keyframes drop { from { translate: 0 -18px; scale: 1.08; opacity: 0; } 18% { opacity: 1; } 62% { translate: 0 0; scale: 1; } 80% { translate: 0 -2.5px; } to { translate: 0 0; } }
+@keyframes tighten { from { box-shadow: 7px 20px 14px rgb(0 0 0 / .22); } 62%, to { box-shadow: var(--cast); } }
+@keyframes clack { from { translate: 0 -6px; } 60% { translate: 0 0; } 80% { translate: 0 -1.5px; } to { translate: 0 0; } }
+@keyframes tighten-a-little { from { box-shadow: 4px 10px 8px rgb(0 0 0 / .36); } 60%, to { box-shadow: var(--cast); } }
+@keyframes lift { 0%, 100% { translate: 0 0; } 45% { translate: 0 -5px; } }
+@keyframes loosen { 0%, 100% { box-shadow: var(--cast); } 45% { box-shadow: 4px 9px 8px rgb(0 0 0 / .36); } }
+@keyframes slide { from { translate: 0 -12px; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+@keyframes card { from { scale: .94; } to { scale: 1; } }
 @keyframes shake { 0%, 100% { translate: 0 0; rotate: 0deg; } 20% { translate: -3px 0; rotate: -5deg; } 40% { translate: 3px 0; rotate: 5deg; } 60% { translate: -2px 0; rotate: -3deg; } 80% { translate: 2px 0; rotate: 2deg; } }
-@keyframes breathe { from { opacity: 1; } to { opacity: .55; } }
-@keyframes beat { 0%, 100% { scale: 1; } 50% { scale: 1.14; } }
-@keyframes gain { from { translate: 0 6px; opacity: 0; } 20% { translate: 0 -4px; opacity: 1; } 70% { translate: 0 -8px; opacity: 1; } to { translate: 0 -14px; opacity: 0; } }
-@keyframes flag { from { opacity: 0; scale: .7; } 6% { opacity: 1; scale: 1.06; } 10% { scale: 1; } 85% { opacity: 1; } to { opacity: 0; } }
-/* The winner: a small burst around their line. */
-.burst { position: absolute; left: 14px; top: 50%; width: 0; height: 0; pointer-events: none; z-index: 8; }
-.burst { left: 50%; }
-.burst i { position: absolute; width: 7px; height: 7px; margin: -3px; border-radius: 2px; background: hsl(var(--c) 85% 62%); rotate: var(--turn); opacity: 0; animation: burst 1.5s cubic-bezier(.1, .7, .3, 1) both; animation-delay: var(--wait, 0ms); }
-.burst i:nth-child(3n) { border-radius: 50%; }
-.burst i:nth-child(4n) { width: 10px; height: 4px; }
-.cheer { animation: cheer .6s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: var(--wait, 0ms); }
-@keyframes cheer { from { scale: 1; } 40% { scale: 1.08; } to { scale: 1; } }
-@keyframes burst { from { translate: 0 0; opacity: 1; scale: 1; } 75% { opacity: 1; } to { translate: calc(cos(var(--turn)) * var(--far)) calc(sin(var(--turn)) * var(--far) + 14px); opacity: 0; scale: .5; } }
-@media (prefers-reduced-motion: reduce) { .tile, .flag, .burst i, #players .chip, #last, #now { animation: none !important; } }
+@keyframes breathe { from { opacity: 1; } to { opacity: .6; } }
+@keyframes point { 0%, 100% { translate: 0 0; } 50% { translate: 2px 0; } }
+/* Points are pencilled in: what was won rises from them and fades. */
+@keyframes gain { from { translate: 0 6px; opacity: 0; } 20% { translate: 0 -3px; opacity: 1; } 70% { translate: 0 -6px; opacity: 1; } to { translate: 0 -11px; opacity: 0; } }
+@keyframes flag { from { opacity: 0; scale: .8; } 6% { opacity: 1; scale: 1.04; } 10% { scale: 1; } 85% { opacity: 1; } to { opacity: 0; } }
+/* The winner: a few paper streamers go up from their line and sink; the line itself nods. */
+.burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; z-index: 8; }
+.burst i { position: absolute; width: 3px; height: 11px; margin: -5px -1px; border-radius: 1px; background: var(--c); opacity: 0; animation: streamer 2s cubic-bezier(.2, .6, .4, 1) both; animation-delay: var(--wait, 0ms); }
+@keyframes streamer { from { translate: 0 0; rotate: 0deg; opacity: 1; } 35% { translate: calc(var(--x) * .8) var(--up); rotate: calc(var(--spin) * .4); opacity: 1; } 80% { opacity: 1; } to { translate: var(--x) calc(var(--up) * -.9); rotate: var(--spin); opacity: 0; } }
+.cheer { animation: cheer .7s ease-in-out both; animation-delay: var(--wait, 0ms); }
+@keyframes cheer { 0%, 100% { scale: 1; } 40% { scale: 1.05; } }
+@media (prefers-reduced-motion: reduce) { .tile, .tile::before, .flag, .burst i, #players li::before, #last, #now { animation: none !important; } }
 
 /* ---------------------------------------------------------------- wider: more room beside the board; a phone: everything under it */
 body.wide { font-size: 13.5px; }
-body.wide #top { height: 32px; }
-body.wide #title { font-size: 18px; }
-body.wide #players li { height: 32px; }
-body.wide #players .score { font-size: 17px; }
-body.wide #now, body.wide #last, body.wide #moves { font-size: 13px; }
-body.wide #now h2, body.wide #last h2 { font-size: 15px; }
-body.wide #last .word { font-size: 18px; }
-body.wide #moves li { height: 23px; }
-body.wide #play { height: 38px; }
-body.phone #table { grid-template-columns: 1fr; grid-template-areas: 'side' 'board' 'hand' 'more'; gap: 6px; }
+body.wide #top { height: 30px; }
+body.wide #title { font-size: 19px; line-height: 30px; }
+body.wide #cols, body.wide #rows { font-size: 9.5px; }
+body.wide #players li { height: 31px; grid-template-columns: 10px 13px 1fr auto; gap: 7px; }
+body.wide #players .score { font-size: 18px; }
+body.wide #now, body.wide #last { font-size: 13px; padding: 8px 12px 9px; }
+body.wide #now h2, body.wide #last h2 { font-size: 15.5px; }
+body.wide #last .word { font-size: 19px; }
+body.wide #moves { font-size: 12.5px; padding: 0 10px 0 6px; background: repeating-linear-gradient(transparent 0 22px, var(--rule) 22px 23px) local, var(--paper); }
+body.wide #moves li { height: 23px; gap: 7px; }
+body.wide #moves .points { font-size: 13px; }
+body.wide #play { height: 38px; font-size: 15px; }
+body.wide .acts button { font-size: 11px; }
+body.phone #table { grid-template-columns: 1fr; grid-template-areas: 'side' 'board' 'hand' 'more'; gap: 5px; }
 body.phone #side { display: contents; }
-body.phone #players { grid-area: side; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
-body.phone #players li { grid-template-columns: 20px 1fr auto; }
+body.phone #players { grid-area: side; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+body.phone #players li:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
 body.phone #players .who small { display: none; }
 body.phone #hand { flex-wrap: wrap; }
 body.phone #play { width: auto; flex: 1; min-width: 70px; }

@@ -1,6 +1,6 @@
 # Word Tiles: a Weave client service for a word game among friends
 
-A board shown its own way. A project's maintainers pin this service to a board; every member's own Weave then fetches it and shows the board through it. A game is a post; two to four friends lay letter tiles on a board of 11 × 11 squares so that they form words that cross the words already there; every move is an event signed by who made it, and every tile on the board has the color of who laid it. It's built into a WebAssembly component that Weave runs itself, with no key, no network and no files: it only turns the board's events into a state, and an action into events for the member to sign.
+A board shown its own way. A project's maintainers pin this service to a board; every member's own Weave then fetches it and shows the board through it. A game is a post; two to four friends lay letter tiles on a board of 11 × 11 squares so that they form words that cross the words already there; every move is an event signed by who made it, and every tile on the board has its letter in the ink of who laid it. It's built into a WebAssembly component that Weave runs itself, with no key, no network and no files: it only turns the board's events into a state, and an action into events for the member to sign.
 
 ```
 npm install
@@ -12,7 +12,7 @@ tar -czf word-tiles.tar.gz board.wasm site
 
 **A game is a post.** Its title names it; its text carries the seed word of its bag (`Bag: plum-river-17`). Whoever made it is its first player; up to three more join it; the turns go round in that order. It begins with the first move: after that nobody joins.
 
-**The board** is 11 × 11: columns A to K, rows 1 to 11, so a square is `F6`. The first word goes through the middle, F6. Some squares are worth more to a tile laid on them, marked quietly:
+**The board** is 11 × 11: columns A to K, rows 1 to 11, so a square is `F6`. The first word goes through the middle, F6. Some squares are worth more to a tile laid on them. They are printed on the board: a small square is a tile (its letter counts 2 or 3 times), a long shape is a word (it counts twice). Here:
 
 ```
      A B C D E F G H I J K          ∴  the letter counts three times (8)
@@ -66,15 +66,17 @@ Its order comes out the same for everyone: the tiles are shuffled by a small gen
 Made for the room a board has in Weave's window (about 540 × 480). From the top:
 
 - **A line**: the game's name (a double-click opens its post in Weave), how many tiles are in the bag, and "Games": all games on the board, the latest first, to pick one, to join one that waits, and to start a new one. The latest game that is not over is shown first.
-- **The board**, large and square: slate with a recess for every square. A tile is glazed in the color of who laid it, so the board is a picture of the game played together; its letter is large, what it counts small in the corner. The last move's tiles have a bright edge.
-- **Beside it** (under it on a phone): the players with their points, whose turn it is; then what there is to do ("Your turn", or what the tiles you laid would count: every word and the sum, or why it is not a move yet); the last move ("+18 · Tobi · GARDEN", "Doubt it" for the others, who doubts it so far); all moves, the latest first.
-- **Under it**: the rack, open to all (dimmed while it is someone else's turn), a button that takes your tiles back, one that shuffles the rack (only for you), and "Play".
+- **The board**, large and square, lying on a table of green baize: a wooden slab in a darker frame with a bevel, the coordinates gilt into the frame as on a chess board (A to K along the top, 1 to 11 down the side), the squares divided by fine inlaid lines, the squares that count more printed on in cream (a small square with a 2), vermilion (with a 3) and gold (a long shape with ×2). The tiles are ivory, like dominoes: a top face with a soft light, a side one can see, a shadow on the wood; the letter is engraved in a serif, what it counts small in the corner. **Who laid a tile is the ink of its letter**: every player has an ink (the tiles on the rack, nobody's yet, are black), so the board is a picture of the game played together without being colorful. Under the last move's tiles lies a ring of light.
+- **Beside it** (under it on a phone): a score pad of ruled paper with a turned pawn for every player in their color, the points in pencil, the leader's underlined, a small brass pointer at whose turn it is; then, on two small cards, what there is to do ("Your turn", or what the tiles you laid would count: every word and the sum, or why it is not a move yet); and the last move ("+18 · Tobi · GARDEN", "Doubt it" as a red stamp for the others, who doubts it so far); all moves, the latest first, as lines on the pad.
+- **Under it**: the rack, a wooden rail the tiles lean on, open to all (a little dimmer while it is someone else's turn), a button that takes your tiles back, one that shuffles the rack (only for you), and "Play", a brass plate.
 
 By hand: drag a tile from the rack to a square (or click the tile, then the square); drag it on, or back; a click on a tile lying tentatively takes it back. While tiles lie there, the view shows the words they would form, the points, and whether it is a legal move, by the same rules `fold` judges by (`site/rules.js` is made from `src/board.js`). "Play" sends it.
 
-Motion: tiles land one after another with a small clack, the word lifts for a moment, the points count up; a friend's move comes over from the rack and says who laid it; a word that is doubted trembles, and when it is taken back its tiles shake and fly back to the rack; the winner gets a small burst.
+Motion: a tile in the hand lifts and tilts; tiles drop onto the board one after another with some weight (a short fall, a tiny bounce, the shadow tightens: the clack), the word lifts for a moment, the points are pencilled in; a friend's move is carried over from the rack and a paper slip says who laid it; a word that is doubted trembles, and when it is taken back its tiles shake and are carried back to the rack; the winner gets a gilt rosette and a few paper streamers.
 
-Wider than 900 the board grows and the column beside it gets more room; narrower than 430 it's a phone. People are chips with their initials in a color made from their name (moved on where two players' colors would be too close); the frame gets no pictures.
+The look is all CSS (gradients, shadows, two pseudo-elements per tile for its face and its side): no pictures, no fonts of its own (Georgia or the system's serif; the pencil is the system's handwriting face, where it has one).
+
+Wider than 900 the board grows and the column beside it gets more room; narrower than 430 it's a phone. A player's color is made from their name (moved on where two players' colors would be too close); the frame gets no pictures of them.
 
 ## How it fits together
 

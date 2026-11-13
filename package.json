@@ -1,0 +1,13 @@
+{
+  "name": "word-tiles",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "rules": "node src/share.js",
+    "build": "node src/share.js && jco componentize src/board.js --wit wit --world-name board --disable all -o board.wasm"
+  },
+  "devDependencies": {
+    "@bytecodealliance/componentize-js": "^0.23.0",
+    "@bytecodealliance/jco": "^1.39.0"
+  }
+}

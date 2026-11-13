@@ -1,0 +1,5 @@
+{
+  "app": "word-tiles",
+  "name": "Word Tiles",
+  "client": { "component": "board.wasm", "site": "site", "writes": ["weave.post", "tiles.join", "tiles.move", "tiles.doubt"] }
+}

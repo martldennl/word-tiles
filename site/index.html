@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Word Tiles</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- The game that is shown: its name (a double-click opens its post in Weave), what is left in the bag, and the way to the other games. -->
+    <header id="top">
+      <h1 id="title" title="Double-click to open the game's post in Weave"></h1>
+      <span id="bag"></span>
+      <span class="gap"></span>
+      <button id="all" type="button" title="All games on this board, and a new one"></button>
+    </header>
+    <main id="table">
+      <!-- The board: 11 × 11 squares. Every tile on it has the color of who laid it. -->
+      <div id="board" role="grid" aria-label="The board"></div>
+      <!-- Beside it: the players and their points, whose turn it is, the last move (and the doubt), all moves. -->
+      <aside id="side">
+        <ol id="players"></ol>
+        <section id="now" aria-live="polite"></section>
+        <section id="last" hidden></section>
+        <ol id="moves"></ol>
+      </aside>
+      <!-- Under it: the rack, open to all, and what one does with it. -->
+      <div id="hand">
+        <div id="rack" aria-label="The rack"></div>
+        <button id="recall" type="button" title="Take your tiles back to the rack" aria-label="Take your tiles back">↩</button>
+        <button id="shuffle" type="button" title="Shuffle the rack (only for you)" aria-label="Shuffle the rack">⇄</button>
+        <span id="over" hidden>The game is over.</span>
+        <span class="gap"></span>
+        <button id="play" type="button">Play</button>
+      </div>
+    </main>
+    <!-- All games on the board, and a new one. Not a form: the frame is sandboxed without forms. -->
+    <section id="games" hidden>
+      <h2 id="none">No game on this board yet</h2>
+      <ol id="list"></ol>
+      <div id="new">
+        <input id="name" placeholder="A new game: its name…" maxlength="80" autocomplete="off" />
+        <button id="start" type="button">Start it</button>
+      </div>
+      <p id="how">Lay words from the open rack so that they cross what lies there. <i class="mark dl"></i> letter ×2 · <i class="mark tl"></i> letter ×3 · <i class="mark dw"></i> word ×2 · all seven +30. No dictionary: a word stands unless the others doubt it.</p>
+    </section>
+    <p id="status" role="status"></p>
+    <!-- Tiles on their way: from the rack to the board, and back when a word is taken back. -->
+    <div id="fly"></div>
+    <script src="rules.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

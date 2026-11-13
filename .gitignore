@@ -1,0 +1,5 @@
+node_modules/
+board.wasm
+*.tar.gz
+tmp/
+preview/out/
